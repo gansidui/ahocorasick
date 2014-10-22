@@ -75,7 +75,7 @@ func (this *Matcher) Match(s string) []int {
 }
 
 // just return the number of len(Match(s))
-func (this *Matcher) GetMatchResultNum(s string) int {
+func (this *Matcher) GetMatchResultSize(s string) int {
 
 	curNode := this.root
 	this.resetMark()

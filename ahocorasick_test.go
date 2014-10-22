@@ -21,7 +21,7 @@ func Test1(t *testing.T) {
 		t.Fatal()
 	}
 
-	if ac.GetMatchResultNum("yasherhs") != 3 {
+	if ac.GetMatchResultSize("yasherhs") != 3 {
 		t.Fatal()
 	}
 }
@@ -55,7 +55,7 @@ func Test3(t *testing.T) {
 	ac.Build(dictionary)
 
 	ret := ac.Match("abcdefghij")
-	if len(ret) != ac.GetMatchResultNum("abcdefghij") || len(ret) != 8 {
+	if len(ret) != ac.GetMatchResultSize("abcdefghij") || len(ret) != 8 {
 		t.Fatal()
 	}
 
@@ -109,7 +109,7 @@ func Benchmark2(b *testing.B) {
 	ac.Build(dictionary)
 
 	for i := 0; i < b.N; i++ {
-		if ac.GetMatchResultNum(randWord(5000, 10000)) > 0 {
+		if ac.GetMatchResultSize(randWord(5000, 10000)) > 0 {
 		}
 	}
 }
