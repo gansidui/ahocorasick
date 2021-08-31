@@ -1,4 +1,4 @@
-##ahocorasick
+## ahocorasick
 
 Aho-Corasick string matching algorithm for golang
 
@@ -28,6 +28,6 @@ func main() {
 
 ~~~
 
-##LICENSE
+## LICENSE
 
 MIT
