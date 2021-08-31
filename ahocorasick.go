@@ -34,13 +34,13 @@ func NewMatcher() *Matcher {
 	}
 }
 
-func BuildNewMatcher(dic []string) *Matcher {
+func BuildNewMatcher(dictionary []string) *Matcher {
 	m := &Matcher{
 		root: newTrieNode(),
 		size: 0,
 		mark: make([]bool, 0),
 	}
-	m.Build(dic)
+	m.Build(dictionary)
 	return m
 }
 
