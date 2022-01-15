@@ -23,7 +23,6 @@ func newTrieNode() *trieNode {
 type Matcher struct {
 	root *trieNode
 	size int
-	mark []bool
 }
 
 type Term struct {
@@ -35,7 +34,6 @@ func NewMatcher() *Matcher {
 	return &Matcher{
 		root: newTrieNode(),
 		size: 0,
-		mark: make([]bool, 0),
 	}
 }
 
@@ -43,7 +41,6 @@ func BuildNewMatcher(dictionary []string) *Matcher {
 	m := &Matcher{
 		root: newTrieNode(),
 		size: 0,
-		mark: make([]bool, 0),
 	}
 	m.Build(dictionary)
 	return m
@@ -55,16 +52,15 @@ func (m *Matcher) Build(dictionary []string) {
 		m.insert(dictionary[i])
 	}
 	m.build()
-	m.mark = make([]bool, m.size)
 }
 
 // string match search
 // return all strings matched as indexes into the original dictionary and their positions on matched string
 func (m *Matcher) Match(s string) []*Term {
 	curNode := m.root
-	m.resetMark()
 	var p *trieNode = nil
 
+	mark := make([]bool, m.size)
 	ret := make([]*Term, 0)
 
 	for index, rune := range s {
@@ -77,8 +73,8 @@ func (m *Matcher) Match(s string) []*Term {
 		}
 
 		p = curNode
-		for p != m.root && p.count > 0 && !m.mark[p.index] {
-			m.mark[p.index] = true
+		for p != m.root && p.count > 0 && !mark[p.index] {
+			mark[p.index] = true
 			for i := 0; i < p.count; i++ {
 				ret = append(ret, &Term{Index: p.index, EndPosition: index})
 			}
@@ -91,11 +87,10 @@ func (m *Matcher) Match(s string) []*Term {
 
 // just return the number of len(Match(s))
 func (m *Matcher) GetMatchResultSize(s string) int {
-
 	curNode := m.root
-	m.resetMark()
 	var p *trieNode = nil
 
+	mark := make([]bool, m.size)
 	num := 0
 
 	for _, v := range s {
@@ -108,8 +103,8 @@ func (m *Matcher) GetMatchResultSize(s string) int {
 		}
 
 		p = curNode
-		for p != m.root && p.count > 0 && !m.mark[p.index] {
-			m.mark[p.index] = true
+		for p != m.root && p.count > 0 && !mark[p.index] {
+			mark[p.index] = true
 			num += p.count
 			p = p.fail
 		}
@@ -157,10 +152,4 @@ func (m *Matcher) insert(s string) {
 	curNode.count++
 	curNode.index = m.size
 	m.size++
-}
-
-func (m *Matcher) resetMark() {
-	for i := 0; i < m.size; i++ {
-		m.mark[i] = false
-	}
 }
