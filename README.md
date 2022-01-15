@@ -2,7 +2,6 @@
 
 Aho-Corasick string matching algorithm for golang
 
-
 ~~~ go
 package main
 
@@ -20,12 +19,9 @@ func main() {
 
 	ret := ac.Match("hello世界, hello google, i love golang!!!")
 
-	for _, i := range ret {
-		fmt.Println(dictionary[i])
+	for _, term := range ret {
+		fmt.Printf("%d %s\n", term.EndPosition-len(dictionary[term.Index])+1, dictionary[term.Index])
 	}
-}
-
-
 ~~~
 
 ## LICENSE
