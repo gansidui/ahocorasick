@@ -26,7 +26,10 @@ type Matcher struct {
 }
 
 type Term struct {
-	Index       int
+	// indicates the index of the matching string in the original dictionary
+	Index int
+
+	// indicates the ending position index of the matched keyword in the input string s
 	EndPosition int
 }
 
@@ -58,59 +61,27 @@ func (m *Matcher) Build(dictionary []string) {
 // return all strings matched as indexes into the original dictionary and their positions on matched string
 func (m *Matcher) Match(s string) []*Term {
 	curNode := m.root
-	var p *trieNode = nil
-
-	mark := make([]bool, m.size)
-	ret := make([]*Term, 0)
+	var ret []*Term
 
 	for index, rune := range s {
 		for curNode.child[rune] == nil && curNode != m.root {
 			curNode = curNode.fail
 		}
-		curNode = curNode.child[rune]
-		if curNode == nil {
-			curNode = m.root
+
+		if curNode.child[rune] != nil {
+			curNode = curNode.child[rune]
 		}
 
-		p = curNode
-		for p != m.root && p.count > 0 && !mark[p.index] {
-			mark[p.index] = true
-			for i := 0; i < p.count; i++ {
-				ret = append(ret, &Term{Index: p.index, EndPosition: index})
+		for p := curNode; p != m.root; p = p.fail {
+			if p.count > 0 {
+				for i := 0; i < p.count; i++ {
+					ret = append(ret, &Term{Index: p.index, EndPosition: index})
+				}
 			}
-			p = p.fail
 		}
 	}
 
 	return ret
-}
-
-// just return the number of len(Match(s))
-func (m *Matcher) GetMatchResultSize(s string) int {
-	curNode := m.root
-	var p *trieNode = nil
-
-	mark := make([]bool, m.size)
-	num := 0
-
-	for _, v := range s {
-		for curNode.child[v] == nil && curNode != m.root {
-			curNode = curNode.fail
-		}
-		curNode = curNode.child[v]
-		if curNode == nil {
-			curNode = m.root
-		}
-
-		p = curNode
-		for p != m.root && p.count > 0 && !mark[p.index] {
-			mark[p.index] = true
-			num += p.count
-			p = p.fail
-		}
-	}
-
-	return num
 }
 
 func (m *Matcher) build() {
@@ -118,16 +89,15 @@ func (m *Matcher) build() {
 	ll.PushBack(m.root)
 	for ll.Len() > 0 {
 		temp := ll.Remove(ll.Front()).(*trieNode)
-		var p *trieNode = nil
 
 		for i, v := range temp.child {
 			if temp == m.root {
 				v.fail = m.root
 			} else {
-				p = temp.fail
+				p := temp.fail
 				for p != nil {
-					if p.child[i] != nil {
-						v.fail = p.child[i]
+					if childNode, ok := p.child[i]; ok {
+						v.fail = childNode
 						break
 					}
 					p = p.fail

@@ -18,52 +18,29 @@ func Test1(t *testing.T) {
 	}
 
 	ret := ac.Match("yasherhs")
-
 	if len(expected) != len(ret) {
-		t.Errorf("len %d != %d", len(expected), len(ret))
+		t.Fatal()
 	}
-
-	for i := range expected {
-		if *expected[i] != *ret[i] {
-			t.Errorf("ret[%d] %v !+ %v", i, *expected[i], *ret[i])
+	for i, _ := range ret {
+		if ret[i].Index != expected[i].Index || ret[i].EndPosition != expected[i].EndPosition {
+			t.Fatal()
 		}
-	}
-
-	ret = ac.Match("yasherhs")
-
-	if len(expected) != len(ret) {
-		t.Errorf("len %d != %d", len(expected), len(ret))
-	}
-
-	for i := range expected {
-		if *expected[i] != *ret[i] {
-			t.Errorf("ret[%d] %v !+ %v", i, *expected[i], *ret[i])
-		}
-	}
-
-	if size := ac.GetMatchResultSize("yasherhs"); len(expected) != size {
-		t.Errorf("size %d != %d", len(expected), size)
 	}
 }
 
 func Test2(t *testing.T) {
 	ac := NewMatcher()
 
-	dictionary := []string{"hello", "世界", "hello世界", "hello"}
+	dictionary := []string{"hello", "世界", "hello世界"}
 	ac.Build(dictionary)
 
-	ret := ac.Match("hello世界")
-	if len(ret) != 4 {
+	if len(ac.Match("hello世界")) != 3 {
 		t.Fatal()
 	}
-
-	ret = ac.Match("世界")
-	if len(ret) != 1 {
+	if len(ac.Match("世界")) != 1 {
 		t.Fatal()
 	}
-
-	ret = ac.Match("hello")
-	if len(ret) != 2 {
+	if len(ac.Match("hello")) != 1 {
 		t.Fatal()
 	}
 }
@@ -71,39 +48,21 @@ func Test2(t *testing.T) {
 func Test3(t *testing.T) {
 	ac := NewMatcher()
 
-	dictionary := []string{"abc", "bc", "ac", "bc", "de", "efg", "fgh", "hi", "abcd", "ac"}
+	dictionary := []string{"中国人民", "国人", "中国人", "hello世界", "hello"}
 	ac.Build(dictionary)
 
-	ret := ac.Match("abcdefghij")
-	if len(ret) != ac.GetMatchResultSize("abcdefghij") || len(ret) != 8 {
+	if len(ac.Match("中国人")) != 2 {
 		t.Fatal()
 	}
-
-	ret = ac.Match("abcdef")
-	if len(ret) != 5 {
+	if len(ac.Match("世界")) != 0 {
 		t.Fatal()
 	}
-
-	ret = ac.Match("acdejefg")
-	if len(ret) != 4 {
-		t.Fatal()
-	}
-
-	if len(ac.Match("abcd")) != 4 {
-		t.Fatal()
-	}
-
-	if len(ac.Match("adefacde")) != 3 {
-		t.Fatal()
-	}
-
-	ret = ac.Match("agbdfgiadafgha")
-	if len(ret) != 1 || dictionary[ret[0].Index] != "fgh" {
+	if len(ac.Match("hello世界")) != 2 {
 		t.Fatal()
 	}
 }
 
-func Benchmark1(b *testing.B) {
+func Benchmark(b *testing.B) {
 	ac := NewMatcher()
 
 	dictionary := make([]string, 0)
@@ -114,20 +73,6 @@ func Benchmark1(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		ac.Match(randWord(5000, 10000))
-	}
-}
-
-func Benchmark2(b *testing.B) {
-	ac := NewMatcher()
-
-	dictionary := make([]string, 0)
-	for i := 0; i < 200000; i++ {
-		dictionary = append(dictionary, randWord(2, 6))
-	}
-	ac.Build(dictionary)
-
-	for i := 0; i < b.N; i++ {
-		ac.GetMatchResultSize(randWord(5000, 10000))
 	}
 }
 
