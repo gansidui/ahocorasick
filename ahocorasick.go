@@ -2,6 +2,7 @@ package ahocorasick
 
 import (
 	"container/list"
+	"unicode/utf8"
 )
 
 type trieNode struct {
@@ -75,7 +76,7 @@ func (m *Matcher) Match(s string) []*Term {
 		for p := curNode; p != m.root; p = p.fail {
 			if p.count > 0 {
 				for i := 0; i < p.count; i++ {
-					ret = append(ret, &Term{Index: p.index, EndPosition: index})
+					ret = append(ret, &Term{Index: p.index, EndPosition: index + utf8.RuneLen(rune)})
 				}
 			}
 		}

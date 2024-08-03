@@ -12,12 +12,13 @@ func Test1(t *testing.T) {
 	ac.Build(dictionary)
 
 	expected := []*Term{
-		{Index: 0, EndPosition: 4},
-		{Index: 1, EndPosition: 4},
-		{Index: 4, EndPosition: 5},
+		{Index: 0, EndPosition: 5},
+		{Index: 1, EndPosition: 5},
+		{Index: 4, EndPosition: 6},
 	}
 
-	ret := ac.Match("yasherhs")
+	s := "yasherhs"
+	ret := ac.Match(s)
 	if len(expected) != len(ret) {
 		t.Fatal()
 	}
@@ -25,27 +26,16 @@ func Test1(t *testing.T) {
 		if ret[i].Index != expected[i].Index || ret[i].EndPosition != expected[i].EndPosition {
 			t.Fatal()
 		}
+
+		original := dictionary[ret[i].Index]
+		matched := s[ret[i].EndPosition-len(original) : ret[i].EndPosition]
+		if original != matched {
+			t.Fatal()
+		}
 	}
 }
 
 func Test2(t *testing.T) {
-	ac := NewMatcher()
-
-	dictionary := []string{"hello", "世界", "hello世界"}
-	ac.Build(dictionary)
-
-	if len(ac.Match("hello世界")) != 3 {
-		t.Fatal()
-	}
-	if len(ac.Match("世界")) != 1 {
-		t.Fatal()
-	}
-	if len(ac.Match("hello")) != 1 {
-		t.Fatal()
-	}
-}
-
-func Test3(t *testing.T) {
 	ac := NewMatcher()
 
 	dictionary := []string{"中国人民", "国人", "中国人", "hello世界", "hello"}
@@ -57,8 +47,19 @@ func Test3(t *testing.T) {
 	if len(ac.Match("世界")) != 0 {
 		t.Fatal()
 	}
-	if len(ac.Match("hello世界")) != 2 {
+
+	s := "hello世界"
+	ret := ac.Match(s)
+	if len(ret) != 2 {
 		t.Fatal()
+	}
+
+	for i, _ := range ret {
+		original := dictionary[ret[i].Index]
+		matched := s[ret[i].EndPosition-len(original) : ret[i].EndPosition]
+		if original != matched {
+			t.Fatal()
+		}
 	}
 }
 
